@@ -1,0 +1,16 @@
+<ng-container *ngIf="!(loading | async); else spinner">
+    <app-pets-list
+    [pets]="pets"
+    [searchname]="searchname"
+    [searchstatuses]="searchstatuses | async"
+    (addPet)="onAddPet()"
+    (editPet)="onEditPet($event)"
+    (deletePet)="onDeletePet($event)"
+    (changeSearchName)="onChangeSearchName($event)"
+    (changeSearchStatuses)="onChangeSearchStatuses($event)" />
+</ng-container>
+<ng-template #spinner>
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+</ng-template> 

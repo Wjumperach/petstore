@@ -1,0 +1,83 @@
+<div [formGroup]="form">
+  <mat-form-field>
+    <mat-label>Name</mat-label>
+    <input matInput [formControl]="form.controls['searchname']" (input)="onChangeName()" [value]="searchname | async">
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Status</mat-label>
+    <mat-select [formControl]="form.controls['searchstatuses']" (selectionChange)="onChangeStatuses($event)">
+      @for (status of statuses; track status.value) {
+        <mat-option [value]="status.value">{{status.viewValue}}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<table mat-table [dataSource]="dataSource" matSort>
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+    <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+  </ng-container>
+
+    <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Category </th>
+        <td mat-cell *matCellDef="let element"> {{element.category?.name ?? ''}} </td>
+      </ng-container>
+    
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="photoUrls">
+        <th mat-header-cell *matHeaderCellDef> PhotoUrls </th>
+        <td mat-cell *matCellDef="let element">
+          <mat-nav-list>
+            @for (url of element.photoUrls; track url) {
+              <a mat-list-item href="..." [activated]="url.isActive">{{ url }}</a>
+            }
+          </mat-nav-list>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tags">
+        <th mat-header-cell *matHeaderCellDef> Tags </th>
+        <td mat-cell *matCellDef="let element"> {{element.tags | list}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+        <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element">
+            <div>
+              <button
+                mat-raised-button
+                (click)="editRow(element)">
+                Edit
+              </button>
+              <button
+                mat-raised-button
+                (click)="removeRow(element)">
+                Delete
+              </button>
+            </div>
+          </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+<mat-paginator [length]="100"
+              [pageSize]="10"
+              [pageSizeOptions]="[5, 10, 25, 100]"
+              aria-label="Select page">
+</mat-paginator>
+
+<button mat-raised-button color="accent" class="bottom-right" (click)="addRow()">
+    Add
+</button>

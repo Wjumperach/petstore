@@ -1,0 +1,78 @@
+<div [formGroup]="form">
+    <mat-dialog-content class="form-container">
+        <mat-form-field>
+            <mat-label>Category</mat-label>
+            <mat-select [formControl]="form.controls['categoryid']" (selectionChange)="selectedCategory($event)">
+                @for (category of categories; track category.value) {
+                    <mat-option [value]="category.value">{{category.viewValue}}</mat-option>
+                  }
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Name</mat-label>
+            <input matInput [formControl]="form.controls['name']" value="name">
+        </mat-form-field>
+
+          <ng-container formArrayName="photoUrls">
+            <mat-label>Photo urls</mat-label> 
+            @for (photoUrl of photoUrls.controls; track photoUrl; let index = $index) {
+                <ng-container [formGroupName]="index">
+                    <div fxLayout="column" fxLayoutAlign="space-between stretch" >
+                        <mat-form-field appearance="fill">
+                            <mat-label>Url</mat-label>
+                            <input matInput type="email" 
+                                    formControlName="url"
+                                    value="url">
+                        </mat-form-field>
+                        <button mat-raised-button  (click)="removePhotoUrl(index)">Delete</button>
+                    </div>
+                </ng-container>
+            }
+
+            <mat-dialog-actions align="end">
+                <button mat-raised-button color="primary" (click)="addPhotoUrl()">Add</button>
+            </mat-dialog-actions>
+          </ng-container>
+
+          <ng-container formArrayName="tags">
+            <mat-label>Tags</mat-label> 
+            @for (tag of tags.controls; track tag; let index = $index) {
+                <ng-container [formGroupName]="index">
+                    <div fxLayout="column" fxLayoutAlign="space-between stretch" >
+                        <mat-form-field appearance="fill">
+                            <mat-label>Id</mat-label>
+                            <input matInput
+                                    formControlName="id"
+                                    value="tag.id">
+                        </mat-form-field>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Name</mat-label>
+                            <input matInput
+                                    formControlName="name"
+                                    value="tag.name">
+                        </mat-form-field>
+                        <button mat-raised-button  (click)="removeTag(index)">Delete</button>
+                    </div>
+                </ng-container>
+            }
+
+            <mat-dialog-actions align="end">
+                <button mat-raised-button color="primary" (click)="addTag()">Add</button>
+            </mat-dialog-actions>
+          </ng-container>
+
+        <mat-form-field>
+            <mat-label>Status</mat-label>
+            <mat-select [formControl]="form.controls['status']">
+              @for (status of statuses; track status.value) {
+                <mat-option [value]="status.value">{{status.viewValue}}</mat-option>
+              }
+            </mat-select>
+            <mat-error>Status is <strong>required</strong></mat-error>
+          </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-raised-button color="primary" (click)="closeDialog()">Save</button>
+        <button mat-raised-button mat-dialog-close>Cancel</button>
+    </mat-dialog-actions>
+</div>
