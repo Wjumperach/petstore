@@ -1,7 +1,7 @@
 import { Injectable, inject, OnDestroy } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Subject, of, tap, takeUntil } from 'rxjs';
-import { map, mergeMap, catchError, exhaustMap, withLatestFrom } from 'rxjs/operators';
+import { Subject, of, takeUntil } from 'rxjs';
+import { map, catchError, exhaustMap, withLatestFrom } from 'rxjs/operators';
 import { MatDialog, } from '@angular/material/dialog';
 
 import { PetsStateService } from '../../services/petsstate.service';
@@ -19,18 +19,16 @@ import { ErrorDialogComponent } from '../../components/error-dialog/error-dialog
 import { Error } from '../../model/error';
 
 @Injectable()
-export class PetsEffects implements OnDestroy{
+export class PetsEffects implements OnDestroy {
   private _dialog = inject(MatDialog);
-
   private _petsStateService = inject(PetsStateService);
   private _petsService = inject(PetsService);
   private _actions$ = inject(Actions);
+  private _destroy$: Subject<void> = new Subject<void>();
 
-  destroy$: Subject<boolean> = new Subject<boolean>();
-
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.unsubscribe();
+  ngOnDestroy() {
+    this._destroy$.next();
+    this._destroy$.complete();
   }
 
   loadPets$ = createEffect(() => this._actions$.pipe(
@@ -108,7 +106,7 @@ export class PetsEffects implements OnDestroy{
 
   openDialog$ = createEffect(() => this._actions$.pipe(
       ofType(OpenDialogActions.openDialog),
-      takeUntil(this.destroy$),
+      takeUntil(this._destroy$),
       exhaustMap(({dialogtype, message}) => {
         if (dialogtype === 0) {
           let dialogRef = this._dialog.open(SuccessDialogComponent);

@@ -15,7 +15,7 @@ export class PetsService {
 
   findByStatus(status: string): Observable<Pet[]> {
     let queryParams = new HttpParams();
-    queryParams = queryParams.append('status', Status.Available)
+    queryParams = queryParams.append('status', status)
     return this.http.get<Pet[]>(petstoreapi + 'findByStatus', {params: queryParams});
   }
 

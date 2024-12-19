@@ -59,31 +59,6 @@ export const petsReducer = createReducer(
     }
   }),
 
-  //on(SearchPetsActions.searchPets, (state) => {
-  //  return {
-  //    ...state,
-  //    loading: true
-  //  }
-  //}),
-
-  //on(SearchPetsActions.searchPetsSuccess, (state, action) => {
-  //  return {
-  //    ...state,
-  //    pets: action.pets,
-  //    loading: false,
-  //    error: ''
-  //  }
-  //}),
-
-  //on(SearchPetsActions.searchPetsError, (state, action) => {
-  //  return {
-  //    ...state,
-  //    pets: [],
-  //    loading: false,
-  //    errormessage: action.error
-  //  }
-  //}),
-
   on(AddPetActions.addPet, (state) => {
     return {
       ...state,

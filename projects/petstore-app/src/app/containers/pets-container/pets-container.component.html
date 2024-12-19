@@ -2,7 +2,7 @@
     <app-pets-list
     [pets]="pets"
     [searchname]="searchname"
-    [searchstatuses]="searchstatuses | async"
+    [searchstatuses]="searchstatuses"
     (addPet)="onAddPet()"
     (editPet)="onEditPet($event)"
     (deletePet)="onDeletePet($event)"

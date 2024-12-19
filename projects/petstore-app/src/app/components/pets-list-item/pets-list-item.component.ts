@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy, SecurityContext } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, NonNullableFormBuilder, Validators, FormArray } from '@angular/forms';
 import { MatDialogModule, MatDialogClose, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
@@ -8,13 +8,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FormGroup } from '@angular/forms';
-import { DomSanitizer } from '@angular/platform-browser';
 
 import { Select } from '../../model/select';
+import { Pet } from '../../model/pet';
 import { Category } from '../../model/category';
-import { PhotoUrl } from '../../model/photourl';
 import { Tag } from '../../model/tag';
 import { Status } from '../../enums/status';
+import { SanitizeService } from '../../services/sanitize.service';
 
 @Component({
   selector: 'app-pets-list-item',
@@ -35,11 +35,9 @@ import { Status } from '../../enums/status';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetsListItemComponent {
-  dialogRef = inject(MatDialogRef<PetsListItemComponent>);
-  formBuilder = inject(NonNullableFormBuilder);
-
-  // TODO: Przenieść do osobnej usługi
-  private sanitizer = inject(DomSanitizer);
+  private _dialogRef = inject(MatDialogRef<PetsListItemComponent>);
+  private _formBuilder = inject(NonNullableFormBuilder);
+  private _sanitizeService = inject(SanitizeService);
 
   categories: Select[] = [
     {value: "0", viewValue: "string"},
@@ -61,7 +59,7 @@ export class PetsListItemComponent {
     {value: Status.Sold, viewValue: Status.Sold},
   ];
 
-  form = this.formBuilder.group({
+  form = this._formBuilder.group({
     categoryid: [
       this.categoryid
     ],
@@ -71,8 +69,8 @@ export class PetsListItemComponent {
         validators: [ Validators.required ]
       }
     ],
-    photoUrls: this.formBuilder.array(this.data.pet.photoUrls?.map((url: string) => this.createPhotoUrl(url)) ?? []),
-    tags: this.formBuilder.array(this.data.pet.tags.map((tag: Tag) => this.createTag(tag))),
+    photoUrls: this._formBuilder.array(this.data.pet.photoUrls?.map((url: string) => this.createPhotoUrl(url)) ?? []),
+    tags: this._formBuilder.array(this.data.pet.tags.map((tag: Tag) => this.createTag(tag))),
     status: [
       this.status,
       {
@@ -101,31 +99,21 @@ export class PetsListItemComponent {
       return;
     }
 
-    //let photoUrls = this.form.controls['photoUrls'].value;
-    //photoUrls = photoUrls.length ? photoUrls.trim().split(/[\r\n]+/) : [];
-
-    // TODO: Popraw nazwy
-
-    const arrayControl1 = this.form.get('photoUrls') as FormArray;
-    const photoUrls = arrayControl1.value.map((photoUrl: PhotoUrl) => this.sanitizeUrl(photoUrl.url));
-
-    const arrayControl = this.form.get('tags') as FormArray;
-    const tags = arrayControl.value.map((tag: Tag) => this.sanitizeTag(tag));
-
-    const pet = {
+    let pet = {
       id: this.id,
       category: this.category,
-      name: this.sanitizeName(this.form.controls['name'].value),
-      photoUrls: photoUrls,
-      tags: tags,
-      status: this.sanitizeStatus(this.form.controls['status'].value),
-    }
-    this.dialogRef.close(pet);
+      name: this.form.controls['name'].value,
+      photoUrls: (this.form.get('photoUrls') as FormArray).value,
+      tags: (this.form.get('tags') as FormArray).value,
+      status: this.form.controls['status'].value,
+    } as Pet;
+    pet = this._sanitizeService.sanitize(pet);
+    this._dialogRef.close(pet);
   }
 
   // TODO: Dodaj walidatory na przykład numeryczne
   addPhotoUrl(): void {
-    const photoUrlForm = this.formBuilder.group({
+    const photoUrlForm = this._formBuilder.group({
       url: [
         '',
         Validators.required
@@ -140,7 +128,7 @@ export class PetsListItemComponent {
   }
 
   createPhotoUrl(url: string): FormGroup {
-    return this.formBuilder.group({
+    return this._formBuilder.group({
       url: [
         url,
         Validators.required
@@ -149,7 +137,7 @@ export class PetsListItemComponent {
   }
 
   addTag(): void {
-    const tagForm = this.formBuilder.group({
+    const tagForm = this._formBuilder.group({
       id: [
         0,
         Validators.required
@@ -168,7 +156,7 @@ export class PetsListItemComponent {
   }
 
   createTag(tag: Tag): FormGroup {
-    return this.formBuilder.group({
+    return this._formBuilder.group({
       id: [
         tag.id,
         Validators.required
@@ -178,32 +166,5 @@ export class PetsListItemComponent {
         Validators.required
       ]
     });
-  }
-
-  sanitizeName(name: string | null): string {
-    if (name) {
-      return this.sanitizer.sanitize(SecurityContext.HTML, name) ?? '';
-    }
-    return '';
-  }
-
-  sanitizeUrl(url: string): string {
-    return this.sanitizer.sanitize(SecurityContext.URL, url) ?? '';
-  }
-
-  sanitizeTag(tag: Tag): Tag {
-    {
-      return {
-        id: tag.id,
-        name: this.sanitizer.sanitize(SecurityContext.HTML, tag.name) ?? ''
-      }
-    }
-  }
-
-  sanitizeStatus(status: string): string {
-    if (status) {
-      return this.sanitizer.sanitize(SecurityContext.HTML, status) ?? '';
-    }
-    return '';
   }
 }

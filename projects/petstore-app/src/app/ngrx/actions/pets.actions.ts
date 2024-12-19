@@ -11,15 +11,6 @@ export const LoadPetsActions = createActionGroup({
   }
 });
 
-//export const SearchPetsActions = createActionGroup({
-//    source: 'Pets',
-//    events: {
-//      'Search pets': props<{name: string, statuses: string[]}>(),
-//      'Search pets success': props<{ pets: Pet[] }>(),
-//      'Search pets error': props<{ error: string }>(),
-//    }
-//  });
-
 export const AddPetActions = createActionGroup({
     source: 'Pets',
     events: {

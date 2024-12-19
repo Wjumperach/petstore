@@ -14,10 +14,7 @@ export const selectSearchStatuses = createSelector(getPetsStore, (state) => stat
 export const selectSearchPets = createSelector(
     selectPets,
     selectSearchName,
-    selectSearchStatuses,
-    (pets: Pet[], name: string, statuses: string) => {
-        console.log(name);
-        console.log(statuses);
-        return name === '' ? pets : pets.filter((pet: Pet) => pet.name?.includes(name) && statuses.includes(pet.status))
+    (pets: Pet[], name: string) => {
+        return name === '' ? pets : pets.filter((pet: Pet) => pet.name?.includes(name));
     }
   );
